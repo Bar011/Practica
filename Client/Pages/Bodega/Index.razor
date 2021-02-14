@@ -1,0 +1,72 @@
+﻿@page "/bodega/index"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h3>Bodegas</h3>
+
+<div>
+    <a class="btn btn-success" href="crear/bodega">Nueva Bodega</a>
+</div>
+
+@if (bodegas == null)
+{
+    <text>Cargando...</text>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bodega in bodegas)
+            {
+                <tr>
+                    <td>
+                        <a class="btn btn-success" href="editar/bodega/@bodega.ID_Bodega">Editar</a>
+                        <button class="btn btn-danger" @onclick="(() => BorrarBodega(bodega.ID_Bodega))">Borrar</button>
+                    </td>
+                    <td>@bodega.ID_Bodega</td>
+                    <td>@bodega.NombreBodega</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    Bodega[] bodegas { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarBodegas();
+    }
+
+    async Task CargarBodegas()
+    {
+        bodegas = await Http.GetFromJsonAsync<Bodega[]>("api/bodega/getall");
+       
+    }
+
+    async Task BorrarBodega(int idbodega)
+    {
+        string mensajeConfirmacion = "¿Deseas borrar la bodega?";
+        if (await JS.InvokeAsync<bool>("confirm", mensajeConfirmacion));
+        await Http.DeleteAsync($"api/bodega/Delete/{idbodega}");
+        await CargarBodegas();
+
+    }
+
+}
+
+
+
+
+

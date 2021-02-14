@@ -1,0 +1,20 @@
+﻿<EditForm Model="@Sucursal" OnValidSubmit="@OnValidSubmit">
+    <div class="form-field">
+        <label>Nombre Sucursal:</label>
+        <div>
+            <InputText @bind-Value="@Sucursal.NombreSucursal" />
+            <div class="form-field">
+            <label>Direccion:</label>
+                </div>
+            <InputText @bind-Value="@Sucursal.DireccionSucursal" />
+            <ValidationMessage For="@(() => Sucursal.NombreSucursal)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">@TextoBoton</button>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code { [Parameter] public Sucursal Sucursal { get; set; } = new Sucursal();
+    [Parameter] public String TextoBoton { get; set; } = "Salvar Cambios";
+    [Parameter] public EventCallback OnValidSubmit { get; set; } }

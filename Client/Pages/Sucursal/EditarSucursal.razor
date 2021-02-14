@@ -1,0 +1,24 @@
+﻿@page "/editar/sucursal/{idSucursal:int}"
+@inject HttpClient Http
+@inject NavigationManager UriHelper
+
+<FormularioSucursal TextoBoton="Editar Comuna" OnValidSubmit="@EditarSucursalNueva" Sucursal="@sucursal" />
+
+@code {
+
+    [Parameter] public int idSucursal { get; set; }
+
+    Sucursal sucursal= new Sucursal();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        sucursal = await Http.GetFromJsonAsync<Sucursal>($"api/sucursal/get/{idSucursal}");
+    }
+
+    async Task EditarSucursalNueva()
+    {
+        await Http.PutAsJsonAsync($"api/sucursal/edit/{idSucursal}", sucursal);
+        UriHelper.NavigateTo("sucursal/index");
+    }
+
+}

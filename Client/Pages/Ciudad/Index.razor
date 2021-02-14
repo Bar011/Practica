@@ -1,0 +1,71 @@
+﻿@page "/ciudad/index"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h3>Ciudades</h3>
+
+<div>
+    <a class="btn btn-success" href="crear/ciudad">Nueva Ciudad</a>
+</div>
+
+@if (ciudades == null)
+{
+    <text>Cargando...</text>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ciudad in ciudades)
+            {
+                <tr>
+                    <td>
+                        <a class="btn btn-success" href="editar/ciudad/@ciudad.Id_Ciudad">Editar</a>
+                        <button class="btn btn-danger" @onclick="(() => BorrarCiudad(ciudad.Id_Ciudad))">Borrar</button>
+                    </td>
+                    <td>@ciudad.Id_Ciudad</td>
+                    <td>@ciudad.NombreCiudad</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    Ciudad[] ciudades { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCiudades();
+    }
+
+    async Task CargarCiudades()
+    {
+        ciudades = await Http.GetFromJsonAsync<Ciudad[]>("api/ciudad/getall");
+        //ciudades = new Ciudad[]
+        //{
+        //    new Ciudad(){ Id = 1, Nombre = "Antofagasta"},
+        //    new Ciudad(){ Id = 2, Nombre = "Valparaiso"},
+        //};
+    }
+
+    async Task BorrarCiudad(int idciudad)
+    {
+        string mensajeConfirmacion = "¿Desea borrar la ciudad?";
+            if (await JS.InvokeAsync<bool>("confirm", mensajeConfirmacion));
+        await Http.DeleteAsync($"api/Ciudad/Delete/{idciudad}");
+        await CargarCiudades();
+
+    }
+}
+
+
+

@@ -1,0 +1,64 @@
+﻿@page "/sucursal/index"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h3>Sucursales</h3>
+
+<div>
+    <a class="btn btn-success" href="crear/sucursal">Nueva Sucursal</a>
+</div>
+
+@if (sucursales == null)
+{
+    <text>Cargando...</text>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sucursal in sucursales)
+            {
+            <tr>
+                <td>
+                    <a class="btn btn-success" href="editar/sucursal/@sucursal.IdSucursal">Editar</a>
+                    <button class="btn btn-danger" @onclick="(() => BorrarSucursal(sucursal.IdSucursal))">Borrar</button>
+                </td>
+                <td>@sucursal.IdSucursal</td>
+                <td>@sucursal.NombreSucursal</td>
+                <td>@sucursal.DireccionSucursal</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+
+    Sucursal[] sucursales { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarSucursal();
+    }
+
+    async Task CargarSucursal()
+    {
+        sucursales = await Http.GetFromJsonAsync<Sucursal[]>("api/sucursal/getall");
+    }
+    async Task BorrarSucursal(int idSucursal)
+    {
+        string mensajeConfirmacion = "¿Desea borrar la sucursal?";
+        if (await JS.InvokeAsync<bool>("confirm", mensajeConfirmacion));
+        await Http.DeleteAsync($"api/sucursal/Delete/{idSucursal}");
+        await CargarSucursal();
+
+    }
+}
